@@ -2,7 +2,6 @@ package fa.dfa;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -55,18 +54,16 @@ public class DFA implements DFAInterface{
 
     @Override
     public boolean setFinal(String name) {
-        //adding it to our final states
-       // return finalStates.add(new DFAState(name));
-        
-       DFAState existingState = getDFAState(name);
-       existingState = states.get(name);
-       // Check if the state exists before marking it as final
-//       if (existingState != null) {
-//           return finalStates.add(existingState);
-//       }
-   
-       // If the state doesn't exist, return false
-       return false;
+        DFAState existingState = getDFAState(name);
+
+        // Check if the state exists before marking it as final
+        if (existingState != null) {
+            finalStates.put(name, existingState);
+            return true;
+        }
+
+        // If the state doesn't exist, return false
+        return false;
     }
 
     @Override   
@@ -99,14 +96,11 @@ public class DFA implements DFAInterface{
     }
 
     private boolean accepts(String s, DFAState state){
-        if(state == null){
+        if (state == null) {
             return false;
-        }else if(s.length() == 1){
-            if(finalStates.containsValue(state.getTransitionState(s.charAt(0)))){
-            return true;
-        }
-        return false;
-        }else{
+        } else if (s.length() == 1) {
+            return finalStates.containsValue(state.getTransitionState(s.charAt(0)));
+        } else {
             return accepts(s.substring(1), (DFAState) state.getTransitionState(s.charAt(0)));
         }
     }
@@ -116,28 +110,20 @@ public class DFA implements DFAInterface{
     @Override
     public Set<Character> getSigma() {
         
-        Set<Character> sigmaSet = new HashSet<>(); //creating a new set to return
-        
-        for(char sigma: alphabet){
-        sigmaSet.add(sigma); //looping thru alphabet to add to new set
-        }
-
-        return sigmaSet; //returning alphabet in new set
+        return alphabet;
 
     }
 
     @Override
     public State getState(String name) {
-        //checking all three places(regular states, start and final) a state can be 
-        //to see if it's created
-        DFAState getState = new DFAState(name); //creating a new state to check against hashset instead of string
+        DFAState getState = states.get(name);
 
-        if(states.containsValue(getState) == true){
-            return (State) getState;
-        } else if(finalStates.containsValue(getState) == true){
-            return (State) getState;
-        } else if (start.getName() == name){
-            return (State) getState;
+        if (getState != null) {
+            return getState;
+        } else if (finalStates.containsKey(name)) {
+            return finalStates.get(name);
+        } else if (start != null && start.getName().equals(name)) {
+            return start;
         }
 
         return null;
@@ -147,17 +133,9 @@ public class DFA implements DFAInterface{
 
     @Override
     public boolean isFinal(String name) {
-        DFAState isFinal = new DFAState(name);
-        //checking if state name given is a final state and then return true or false
-       
-        return isFinal != null && finalStates.containsValue(isFinal);
-     /*   
-        if(finalStates.contains(isFinal) == true){
-            return true;
-        }
-        System.out.println(name + " is not a final state");
-        return false;
-        */
+        
+        return finalStates.containsKey(name);
+
     }
 
     @Override
