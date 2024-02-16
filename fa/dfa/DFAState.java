@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import fa.State;
 /**
- * This class extends state to create a DFAState that we will then use
+ * This class extends State to create a DFAState that we will then use
  * in our DFA class. It can addStateTransition, return the next state we can visit 
  * upon a given symbol and set the name of a state.
  * @author Pierce Rodriguez and Nolan Stetz
@@ -14,8 +14,9 @@ import fa.State;
 public class DFAState extends State{
 
     //instantiating our transition map and DFAState.
-    private Map<Character, State> transitionMap;
+    private final Map<Character, DFAState> transitionMap;
     protected DFAState newState;
+    protected boolean isFinal;
 
     /**
      * Constructor for our DFAState
@@ -24,7 +25,7 @@ public class DFAState extends State{
      */
     public DFAState(String name) {
         super(name);
-        transitionMap = new HashMap<>();
+        this.transitionMap = new HashMap<>();
     }
     /**
      * Puts a new transition with our parameters(char symbol, State nextState) in our hash map of transitions
@@ -35,23 +36,28 @@ public class DFAState extends State{
         transitionMap.put(symbol, nextState);
     }
 
-    public State getTransitionState(char symbol){
+    /**
+     * Returns the DFAState for the transition given the symbol.
+     * @param symbol
+     * @return DFAState
+     */
+    public DFAState getTransitionState(char symbol){
         return transitionMap.get(symbol);
     }
     /**
      * Returns the next state given a character. We already know what state we 
      * are at.
      * @param symbol
-     * @return the next state by finding where the symbol goes based on our
+     * @return the next DFAState by finding where the symbol goes based on our
      * hash map. We already know what state we are at.
      */
-    public State nextState(char symbol){
+    public DFAState nextState(char symbol){
         return transitionMap.get(symbol);
     }
     /**
      * Creates a new state when you want to change the name of existing one
      * @param newName
-     * @return true or false depending if the state name isn't null
+     * @return true or false depending on if the state name isn't null
      */
     public boolean setName(String newName) {
         if(newName != null){ //checking if newName is null
@@ -61,10 +67,20 @@ public class DFAState extends State{
             return false;
         }
     }
+
+    /**
+     * removes transition given a symbol
+     * @param symbol
+     */
     public void removeTransition(Character symbol) {
        transitionMap.remove(symbol);
     }
-    public DFAState get(Character symb) {
-        return (DFAState) transitionMap.get(symb);
+
+    /**
+     * setter that changes boolean inside the state from false to true
+     */
+    public void createFinal(){
+        this.isFinal = true;
     }
+
 }
